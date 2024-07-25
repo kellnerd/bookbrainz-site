@@ -43,14 +43,16 @@ BEGIN;
 
 CREATE VIEW bookbrainz.series AS
 	SELECT
-		e.bbid, sd.id AS data_id, sr.id AS revision_id, (sr.id = s.master_revision_id) AS master, sd.entity_type, sd.annotation_id, sd.disambiguation_id,
-		als.default_alias_id, sd.ordering_type_id, sd.alias_set_id, sd.identifier_set_id,
+		e.bbid, sd.id AS data_id, sr.id AS revision_id, (sr.id = sh.master_revision_id) AS master, sd.entity_type, sd.annotation_id, sd.disambiguation_id, dis.comment disambiguation,
+		als.default_alias_id, al."name", al.sort_name, sd.ordering_type_id, sd.alias_set_id, sd.identifier_set_id,
 		sd.relationship_set_id, e.type
 	FROM bookbrainz.series_revision sr
 	LEFT JOIN bookbrainz.entity e ON e.bbid = sr.bbid
-	LEFT JOIN bookbrainz.series_header s ON s.bbid = e.bbid
+	LEFT JOIN bookbrainz.series_header sh ON sh.bbid = e.bbid
 	LEFT JOIN bookbrainz.series_data sd ON sr.data_id = sd.id
 	LEFT JOIN bookbrainz.alias_set als ON sd.alias_set_id = als.id
+	LEFT JOIN bookbrainz.alias al ON al.id = als.default_alias_id
+	LEFT JOIN bookbrainz.disambiguation dis ON dis.id = sd.disambiguation_id
 	WHERE e.type = 'Series';
 
 COMMIT;
